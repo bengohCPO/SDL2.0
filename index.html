@@ -663,8 +663,7 @@
           settingTitle: "Setting the Scene",
           setting: [
             `In Upper Secondary, you have purposely chosen a subject combination that best aligns with your interests in the Sciences. Now, near the end of Term 1 in Secondary 3, you are faced with another choice - Elective Modules on SLS, which are learning opportunities for him to choose by his interests and needs.`,
-            `You are feeling slightly overwhelmed by the choices available. *I'm still figuring out what I'm interested in*, you thought to yourself. However, you recall your experiences in primary school and lower secondary, which has grown your capacity to learn independently. You have some knowledge of **how to learn** and reflecting on what **matters most to you**. `,
-            
+            `You are feeling slightly overwhelmed by the choices available. *I'm still figuring out what I'm interested in*, you thought to yourself. However, you recall your experiences in primary school and lower secondary, which has grown your capacity to learn independently. You have some knowledge of **how to learn** and reflecting on what **matters most to you**. `
           ],
           nextSceneId: null,
           endTitle: "SCENE 3 — End",
@@ -689,7 +688,7 @@
                   label: "Option B",
                   text: `Choose an EM on Chinese Literature - even though your school might not have offered Chinese Literature as a subject, you have recently discovered a few Chinese science fiction books that you really liked, and would want to learn more about them.`,
                   outcome: `The EM gave you a new perpective of how fun languages can be, and how different ideas could be presented differently in your mother tongue. This has prompted you to read more widely in your mother tongue, and explore other genres.`
-                },
+                }
               ]
             },
             {
@@ -718,9 +717,8 @@
               title: "Choice 9 — Keeping up to date!",
               prompt: [
                 `Congratulations! You have graduated from your secondary school, and you are currently in your first year of Junior College.`,
-                `During General Paper lesson, your tutor assigned your class to prepare for a presentation on AI and its effects on human society. You groaned, remembering the discussion your classmates had about how 'AI slop' is undermining the hard work and time that artists have put in. ` 
-                `As you logged into SLS, you noticed that some EMs have been recently updated to reflect the latest developments of AI in various field, such as how a local company utilised AI in the developemnt of a gene therapy apporach for cancer treatement, while another made use of AI in the clasisfication of fine art.` 
-                
+                `During General Paper lesson, your tutor assigned your class to prepare for a presentation on AI and its effects on human society. You groaned, remembering the discussion your classmates had about how 'AI slop' is undermining the hard work and time that artists have put in. `,
+                `As you logged into SLS, you noticed that some EMs have been recently updated to reflect the latest developments of AI in various field, such as how a local company utilised AI in the developemnt of a gene therapy apporach for cancer treatement, while another made use of AI in the clasisfication of fine art.`
               ],
               reflection: `How would my learning look like, if what I learnt could keep up with how the world changes?`,
               options: [
@@ -735,6 +733,8 @@
                   outcome: `You reflect that AI has the ability to impact diverse fields, and can be a powerful tool for your own learning in school as well.`
                 }
               ]
+            }
+          ]
         }
       ]
     };
@@ -941,6 +941,10 @@
       screen.appendChild(createFormattedElement("h2", "", choice.title));
       appendParagraphs(screen, choice.prompt);
 
+      if (choice.reflection) {
+        screen.appendChild(createFormattedElement("div", "reflection-callout", choice.reflection));
+      }
+
       const choiceList = createElement("div", "choice-list");
       choice.options.forEach((option) => {
         const optionButtonText = `${option.label}: ${option.text}`;
@@ -950,10 +954,6 @@
         choiceList.appendChild(optionButton);
       });
       screen.appendChild(choiceList);
-
-      if (choice.reflection) {
-        screen.appendChild(createFormattedElement("div", "reflection-callout", choice.reflection));
-      }
 
       contentPanel.appendChild(screen);
       resetInternalScroll();
