@@ -580,8 +580,8 @@
           endText: [
             `You've spent a term on something that felt purposeful. Uncle Ahmad's canteen is a little different now. You've learned something about what it means to make learning matter beyond the classroom.`,
             `You're heading into upper secondary. The choices are about to increase in more exciting ways.`,
-            `In upper Secondary, you will choose **Elective Modules** that reflect your own interests and strengths. The habits you have built - of asking why, staying with uncertainty, and connecting ideas - will help you decided **what** Elective Modules to choose, and **how** you are going to leverage them for your learning. Already, you are excited to explore an Elective Module on design, to extend what you learned in Uncle Ahmad's canteen.`,
-            `More importantly, you are hopeful that the choices you make in Upper Secondary - in **what** and **how** you learn - might lead you towards something bigger: a sense of purpose. You are excited to see how that sense of purpose might one day help you to contribute to wider society.`,
+            `In upper Secondary, you will choose **Elective Modules** that reflect your own interests and strengths. The habits you have built - of asking why, staying with uncertainty, and connecting ideas - will help you decided **what** Elective Modules to choose, and **how** you are going to leverage them for your learning. Already, you are excited to explore an Elective Module on design, to extend what y ou learned in Uncle Ahmad's canteen.`,
+            `More importantly, you are hopeful that the choices you make in Upper Secondary - in **what** and **how** you learn - might lead you towards something bigger: a sense of purpose. You are excited to see how that sense of purpose might one day help you to contribute to wider society.`
           ],
           choices: [
             {
@@ -749,8 +749,11 @@
     // Navigation state.
     const totalChoices = storyData.scenes.reduce((sum, scene) => sum + scene.choices.length, 0);
     const playerChoices = [];
+    const SAVE_KEY = "gabrielLearningJourneySave-v1";
     let currentSceneIndex = 0;
     let currentChoiceIndex = 0;
+    let currentView = "welcome";
+    let savedSelectedOption = null;
 
     const contentPanel = document.getElementById("content-panel");
     const progressText = document.getElementById("progress-text");
@@ -764,6 +767,75 @@
 setMobileViewportHeight();
 window.addEventListener("resize", setMobileViewportHeight);
 window.addEventListener("orientationchange", setMobileViewportHeight);
+
+    // Local storage helpers: save and restore progress on the same browser and device.
+    function isLocalStorageAvailable() {
+      try {
+        const testKey = `${SAVE_KEY}-test`;
+        localStorage.setItem(testKey, "1");
+        localStorage.removeItem(testKey);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function saveGameState() {
+      if (!isLocalStorageAvailable()) {
+        return;
+      }
+
+      const saveData = {
+        version: 1,
+        playerChoices,
+        currentSceneIndex,
+        currentChoiceIndex,
+        currentView,
+        savedSelectedOption
+      };
+
+      localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+    }
+
+    function loadGameState() {
+      if (!isLocalStorageAvailable()) {
+        return null;
+      }
+
+      const savedData = localStorage.getItem(SAVE_KEY);
+
+      if (!savedData) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(savedData);
+      } catch (error) {
+        localStorage.removeItem(SAVE_KEY);
+        return null;
+      }
+    }
+
+    function clearSavedGameState() {
+      if (isLocalStorageAvailable()) {
+        localStorage.removeItem(SAVE_KEY);
+      }
+    }
+
+    function restoreSavedChoices(savedChoices) {
+      playerChoices.splice(0, playerChoices.length);
+
+      if (Array.isArray(savedChoices)) {
+        playerChoices.push(...savedChoices);
+      }
+    }
+
+    function isValidSceneAndChoice(sceneIndex, choiceIndex) {
+      return Boolean(
+        storyData.scenes[sceneIndex] &&
+        storyData.scenes[sceneIndex].choices[choiceIndex]
+      );
+    }
     
     // Formatting helpers: safely escape story text, then convert simple inline markers into styled HTML.
     function escapeHtml(text) {
@@ -894,6 +966,12 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
 
     // Render functions.
     function renderWelcome() {
+      currentView = "welcome";
+      currentSceneIndex = 0;
+      currentChoiceIndex = 0;
+      savedSelectedOption = null;
+      saveGameState();
+
       clearContent();
       updateProgress("welcome");
 
@@ -915,8 +993,11 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
     }
 
     function renderSceneOpening(sceneIndex) {
+      currentView = "scene-opening";
       currentSceneIndex = sceneIndex;
       currentChoiceIndex = 0;
+      savedSelectedOption = null;
+      saveGameState();
 
       const scene = storyData.scenes[sceneIndex];
       const nextChoiceNumber = getNextChoiceNumberForScene(sceneIndex);
@@ -943,8 +1024,11 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
     }
 
     function renderChoice(sceneIndex, choiceIndex) {
+      currentView = "choice";
       currentSceneIndex = sceneIndex;
       currentChoiceIndex = choiceIndex;
+      savedSelectedOption = null;
+      saveGameState();
 
       const scene = storyData.scenes[sceneIndex];
       const choice = scene.choices[choiceIndex];
@@ -976,6 +1060,12 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
     }
 
     function renderOutcome(sceneIndex, choiceIndex, selectedOption) {
+      currentView = "outcome";
+      currentSceneIndex = sceneIndex;
+      currentChoiceIndex = choiceIndex;
+      savedSelectedOption = selectedOption;
+      saveGameState();
+
       const scene = storyData.scenes[sceneIndex];
       const choice = scene.choices[choiceIndex];
 
@@ -1010,7 +1100,14 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
     }
 
     function renderSceneEnd(sceneIndex) {
+      currentView = "scene-end";
+      currentSceneIndex = sceneIndex;
+      savedSelectedOption = null;
+
       const scene = storyData.scenes[sceneIndex];
+      currentChoiceIndex = Math.max(0, scene.choices.length - 1);
+      saveGameState();
+
       const lastChoiceNumber = scene.choices.length ? scene.choices[scene.choices.length - 1].id : 0;
 
       clearContent();
@@ -1073,6 +1170,9 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
       playerChoices.splice(0, playerChoices.length);
       currentSceneIndex = 0;
       currentChoiceIndex = 0;
+      currentView = "welcome";
+      savedSelectedOption = null;
+      clearSavedGameState();
       renderWelcome();
     }
 
@@ -1100,6 +1200,12 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
     }
 
     function renderFinalSummary() {
+      currentView = "final";
+      currentSceneIndex = storyData.scenes.length - 1;
+      currentChoiceIndex = Math.max(0, storyData.scenes[currentSceneIndex].choices.length - 1);
+      savedSelectedOption = null;
+      saveGameState();
+
       clearContent();
       updateProgress("final");
 
@@ -1139,8 +1245,38 @@ window.addEventListener("orientationchange", setMobileViewportHeight);
       resetInternalScroll();
     }
 
-    // Start the single-page game.
-    renderWelcome();
+    // Restore saved progress, or start the single-page game from the welcome screen.
+    function restoreGameOrStartFresh() {
+      const savedData = loadGameState();
+
+      if (!savedData || savedData.version !== 1) {
+        renderWelcome();
+        return;
+      }
+
+      restoreSavedChoices(savedData.playerChoices);
+      currentSceneIndex = Number.isInteger(savedData.currentSceneIndex) ? savedData.currentSceneIndex : 0;
+      currentChoiceIndex = Number.isInteger(savedData.currentChoiceIndex) ? savedData.currentChoiceIndex : 0;
+      currentView = savedData.currentView || "welcome";
+      savedSelectedOption = savedData.savedSelectedOption || null;
+
+      if (currentView === "scene-opening" && storyData.scenes[currentSceneIndex]) {
+        renderSceneOpening(currentSceneIndex);
+      } else if (currentView === "choice" && isValidSceneAndChoice(currentSceneIndex, currentChoiceIndex)) {
+        renderChoice(currentSceneIndex, currentChoiceIndex);
+      } else if (currentView === "outcome" && isValidSceneAndChoice(currentSceneIndex, currentChoiceIndex) && savedSelectedOption) {
+        renderOutcome(currentSceneIndex, currentChoiceIndex, savedSelectedOption);
+      } else if (currentView === "scene-end" && storyData.scenes[currentSceneIndex]) {
+        renderSceneEnd(currentSceneIndex);
+      } else if (currentView === "final") {
+        renderFinalSummary();
+      } else {
+        clearSavedGameState();
+        renderWelcome();
+      }
+    }
+
+    restoreGameOrStartFresh();
   </script>
 </body>
 </html>
