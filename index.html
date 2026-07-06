@@ -41,10 +41,11 @@
     body {
       min-height: 100%;
     }
-
-   .game-container {
+    
+.game-container {
   width: min(980px, 100%);
   height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   height: 100dvh;
   min-height: 0;
   margin: 0 auto;
@@ -54,8 +55,7 @@
   box-shadow: 0 0 40px var(--shadow);
   overflow: hidden;
 }
-
-    .progress-shell {
+   .progress-shell {
       flex: 0 0 auto;
       background: rgba(255, 250, 242, 0.98);
       border-bottom: 1px solid var(--border);
@@ -101,14 +101,14 @@
       transition: width 220ms ease;
     }
 
-.content-panel {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  padding: clamp(1.25rem, 4vw, 2.5rem);
-  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+    .content-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: clamp(1.25rem, 4vw, 2.5rem);
+      padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
 }
 
     .screen {
@@ -756,6 +756,15 @@
     const progressText = document.getElementById("progress-text");
     const progressFill = document.getElementById("progress-fill");
 
+    function setMobileViewportHeight() {
+  const viewportHeight = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty("--vh", `${viewportHeight}px`);
+}
+
+setMobileViewportHeight();
+window.addEventListener("resize", setMobileViewportHeight);
+window.addEventListener("orientationchange", setMobileViewportHeight);
+    
     // Formatting helpers: safely escape story text, then convert simple inline markers into styled HTML.
     function escapeHtml(text) {
       return String(text)
