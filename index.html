@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Learning Journey: A Story of Gabriel — and You</title>
+  <style>
+    :root {
+      --background: #f7f1e8;
+      --surface: #fffaf2;
+      --surface-strong: #fff5e6;
+      --text: #24333a;
+      --muted: #5d6c72;
+      --heading: #17495a;
+      --button: #1f5a6b;
+      --button-hover: #276f83;
+      --button-active: #143d49;
+      --accent: #d99b38;
+      --accent-soft: #fff0cf;
+      --border: #e5d8c5;
+      --shadow: rgba(45, 35, 25, 0.16);
+      --timeline-line: #d7b46a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(217, 155, 56, 0.16), transparent 32rem),
+        linear-gradient(135deg, #f7f1e8 0%, #edf4f3 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100%;
+    }
+
+    .game-container {
+      width: min(980px, 100%);
+      height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 250, 242, 0.92);
+      box-shadow: 0 0 40px var(--shadow);
+      overflow: hidden;
+    }
+
+    .progress-shell {
+      flex: 0 0 auto;
+      background: rgba(255, 250, 242, 0.98);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem clamp(1rem, 3vw, 2rem);
+      z-index: 10;
+    }
+
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .progress-title {
+      margin: 0;
+      color: var(--heading);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      font-weight: 750;
+      letter-spacing: 0.01em;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 0.55rem;
+      background: #eadfce;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--button));
+      border-radius: inherit;
+      transition: width 220ms ease;
+    }
+
+    .content-panel {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: clamp(1.25rem, 4vw, 2.5rem);
+      scroll-behavior: smooth;
+    }
+
+    .screen {
+      max-width: 780px;
+      margin: 0 auto;
+      animation: fadeIn 180ms ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .kicker {
+      margin: 0 0 0.5rem;
+      color: var(--accent);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--heading);
+      line-height: 1.15;
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+    }
+
+    h2 {
+      margin: 0 0 1rem;
+      font-size: clamp(1.55rem, 3.5vw, 2.35rem);
+    }
+
+    h3 {
+      margin: 1.25rem 0 0.7rem;
+      font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+    }
+
+    p {
+      margin: 0 0 1rem;
+      font-size: clamp(1rem, 2.2vw, 1.08rem);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: clamp(1.2rem, 3vw, 2rem);
+      box-shadow: 0 18px 42px rgba(54, 41, 30, 0.08);
+    }
+
+    .scene-card {
+      border-left: 0.55rem solid var(--button);
+    }
+
+    .closing-card {
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      border-left: 0.55rem solid var(--accent);
+    }
+
+    .choice-card {
+      border-top: 0.4rem solid var(--button);
+    }
+
+    .outcome-card {
+      margin-top: 1.25rem;
+      background: #f8fbfa;
+      border: 1px solid #cddfdb;
+      border-radius: 20px;
+      padding: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    .selected-option {
+      background: #edf6f4;
+      border: 1px solid #c7dfd9;
+      border-radius: 16px;
+      padding: 1rem;
+      margin: 1rem 0 1.25rem;
+      color: var(--heading);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .reflection-callout {
+      margin: 1.25rem 0;
+      padding: 1rem 1.15rem;
+      border-left: 0.35rem solid var(--accent);
+      border-radius: 16px;
+      background: var(--accent-soft);
+      color: #59411b;
+      font-style: italic;
+      line-height: 1.65;
+      box-shadow: inset 0 0 0 1px rgba(217, 155, 56, 0.14);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-top: 1.5rem;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 0.85rem;
+      margin: 1.25rem 0 1rem;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .primary-button,
+    .choice-button,
+    .secondary-button {
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      transition:
+        transform 140ms ease,
+        background 140ms ease,
+        box-shadow 140ms ease;
+    }
+
+    .primary-button,
+    .secondary-button {
+      padding: 0.9rem 1.25rem;
+      background: var(--button);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 10px 22px rgba(31, 90, 107, 0.2);
+    }
+
+    .secondary-button {
+      background: #48626b;
+    }
+
+    .choice-button {
+      width: 100%;
+      padding: 1rem 1.1rem;
+      background: #f2f8f7;
+      border: 1px solid #bfd8d2;
+      color: var(--heading);
+      font-weight: 750;
+      line-height: 1.5;
+      text-align: left;
+      border-radius: 18px;
+    }
+
+    .primary-button:hover,
+    .secondary-button:hover,
+    .choice-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-button:hover,
+    .choice-button:hover {
+      background: var(--button-hover);
+      color: #fff;
+      box-shadow: 0 14px 26px rgba(31, 90, 107, 0.24);
+    }
+
+    .secondary-button:hover {
+      background: #587680;
+      color: #fff;
+    }
+
+    .primary-button:active,
+    .secondary-button:active,
+    .choice-button:active {
+      transform: translateY(1px);
+      background: var(--button-active);
+      color: #fff;
+    }
+
+    .timeline {
+      position: relative;
+      margin: 1.75rem 0 2rem;
+      padding-left: 1.65rem;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 0.3rem;
+      bottom: 0.3rem;
+      left: 0.4rem;
+      width: 3px;
+      border-radius: 999px;
+      background: var(--timeline-line);
+    }
+
+    .timeline-entry {
+      position: relative;
+      margin: 0 0 1.2rem;
+      padding: 1rem 1rem 1rem 1.15rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 12px 28px rgba(54, 41, 30, 0.06);
+    }
+
+    .timeline-entry::before {
+      content: "";
+      position: absolute;
+      left: -1.55rem;
+      top: 1.15rem;
+      width: 0.85rem;
+      height: 0.85rem;
+      background: var(--accent);
+      border: 3px solid var(--surface);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--timeline-line);
+    }
+
+    .timeline-entry h3 {
+      margin: 0 0 0.45rem;
+      font-size: 1.05rem;
+    }
+
+    .timeline-entry p {
+      margin-bottom: 0.45rem;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .timeline-label {
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .closing-note {
+      margin-top: 2rem;
+      padding: clamp(1.15rem, 3vw, 1.7rem);
+      background: var(--accent-soft);
+      border: 1px solid rgba(217, 155, 56, 0.35);
+      border-radius: 22px;
+    }
+
+    .closing-note h2 {
+      margin-bottom: 1rem;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 640px) {
+      .progress-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .progress-text {
+        white-space: normal;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+
+      .primary-button,
+      .secondary-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-container" aria-label="Your Learning Journey game">
+    <section class="progress-shell" aria-label="Game progress">
+      <div class="progress-row">
+        <p class="progress-title">Your Learning Journey</p>
+        <p class="progress-text" id="progress-text">How to Play · Choice 0 of 11</p>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </section>
+
+    <section class="content-panel" id="content-panel" aria-live="polite"></section>
+  </main>
+
+  <script>
+    // Data layer: all storyline content, scene order, choice labels, outcomes, and scene pointers live here.
+    const storyData = {
+      title: "Your Learning Journey: A Story of Gabriel — and You",
+      introTitle: "How to Play",
+      intro: [
+        `You are Gabriel. As you move through school, you will face moments where you need to make choices — about <b>how to learn, who to work with, and what matters to you</b>. There are no wrong answers. Some paths will be harder, some more rewarding. Pay attention to why you make each choice. That's where the real learning happens.`
+      ],
+      closingNoteTitle: "A Note for Players",
+      closingNote: [
+        `Throughout this game, you were never asked to get the "right" answer. You were asked to make choices — and to notice, even briefly, why you made them.`,
+        `That noticing is the point. It's what Gabriel was learning to do, across every scene. And it's what self-directed learning actually looks like: not a perfect plan, but a growing awareness of yourself as someone who learns, adapts, reflects, and keeps going.`,
+        `What kind of learner are you becoming?`
+      ],
+      scenes: [
+        {
+          id: "scene-1",
+          title: "SCENE 1: Primary 5 — The Reading Corner Problem",
+          settingTitle: "Setting the Scene",
+          setting: [
+            `It's a Tuesday morning in Mrs. Raj's Mathematics class. You feel bothered about something she had explained. She had drawn two shapes on the board — a long, thin rectangle and a squarish one. Both have the same perimeter. But their areas are completely different.`,
+            `How can that be? You stare at your notebook. The numbers are right there, but they don't feel real yet.`,
+            `Then Mrs. Raj announces a class project: your class will redesign the reading corner. She wants your group to come up with the best possible layout — one that gives students the most space and feels welcoming.`,
+            `You look over at the reading corner. It's a bit cramped. You've always wanted it to be better.`
+          ],
+          nextSceneId: "scene-2",
+          endTitle: "End of Scene 1",
+          endText: [
+            `However you played this scene, you leave Primary 5 with something. Maybe it's a clearer understanding of area and perimeter. Maybe it's a new way of working with others. Maybe it's the beginning of a habit — of asking why, of connecting ideas, of noticing when something doesn't quite make sense yet and staying with it until it does.`,
+            `Secondary school is coming. Things are about to get bigger.`
+          ],
+          choices: [
+            {
+              id: 1,
+              title: "Choice 1 — How do you want to start?",
+              prompt: [
+                `Mrs. Raj gives your group some time to plan. Your groupmates are already talking over each other. You have a few ideas about how to begin.`
+              ],
+              reflection: `Take a moment — why did you pick that option? What were you hoping it would help you do?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Jump straight in — start measuring the reading corner right away so you have real numbers to work with.`,
+                  outcome: `If you chose A: You grab the measuring tape and get to work. The numbers ground you — you now know exactly how much space you have. But when your group starts arguing about which layout is best, you realise you don't yet have a way to compare them fairly. You'll need to think about what "best" actually means.`
+                },
+                {
+                  label: "Option B",
+                  text: `Sketch a few layout ideas first, so your group has something to discuss before measuring.`,
+                  outcome: `If you chose B: Your sketches spark a lively discussion. But when someone asks, "Will this layout actually fit?", you realise you need measurements to check. The ideas are exciting — now you need the numbers to back them up.`
+                },
+                {
+                  label: "Option C",
+                  text: `Ask Mrs. Raj what she thinks the most important thing to figure out is before you start.`,
+                  outcome: `If you chose C: Mrs. Raj smiles and says, "Good question. What do you think matters most — the space, the comfort, or the look?" You hadn't thought about all three at once. It makes the problem feel bigger, but also more interesting.`
+                }
+              ]
+            },
+            {
+              id: 2,
+              title: "Choice 2 — The Problem Gets Complicated",
+              prompt: [
+                `Your group has two possible layouts. Layout A is long and narrow. Layout B is more square-shaped. Both fit within the same perimeter — the same total length of wall space. But when you calculate the areas, Layout B gives noticeably more floor space.`,
+                `Your groupmate Priya says, "Let's just go with B, it's obviously bigger."`,
+                `But you remember something from Science — the reading corner is near the window. A long, narrow layout might actually get more natural light across the whole space.`
+              ],
+              reflection: `Why did you choose that? What were you weighing up?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Agree with Priya. The bigger area is more important — students need room to move.`,
+                  outcome: `If you chose A: Your group moves quickly and confidently. The design comes together fast. But during the presentation, Mrs. Raj asks, "Did you think about how the light falls?" You pause. You had thought about it — but let it go. You make a note to yourself: speed isn't always the same as thoroughness.`
+                },
+                {
+                  label: "Option B",
+                  text: `Push back gently. Suggest that light and comfort matter too, not just floor space.`,
+                  outcome: `If you chose B: Priya looks a little annoyed at first, but listens. The conversation slows down — but gets richer. Your group starts thinking about what "best" really means for the people who'll use the space.`
+                },
+                {
+                  label: "Option C",
+                  text: `Propose testing both layouts by sketching how light would fall across each one, before deciding.`,
+                  outcome: `If you chose C: It takes more time, but your group ends up with a much more considered design. You feel the difference between a quick answer and a well-reasoned one.`
+                }
+              ]
+            },
+            {
+              id: 3,
+              title: "Choice 3 — Reflection Time",
+              prompt: [
+                `At the end of the week, Mrs. Raj asks everyone to write a short reflection in their learning journal. She asks: What did you learn — not just about Math, but about how you learn?`,
+                `You think about the week. The confusion at the start. The measuring. The arguments in your group. The moment the area-perimeter idea finally clicked.`
+              ],
+              reflection: `What feels most true to what you actually experienced this week?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Write about the Math — how you now understand that same perimeter doesn't mean same area.`,
+                  outcome: `If you chose A: Mrs. Raj affirms your mathematical understanding. She also gently asks, "How did you figure it out? What helped the idea click?" You realise the how is just as worth remembering as the what.`
+                },
+                {
+                  label: "Option B",
+                  text: `Write about working with your group — what was hard and what helped.`,
+                  outcome: `If you chose B: Mrs. Raj notes that you're already thinking about collaboration as a skill. She asks, "What would you do differently next time — and why?" You find yourself thinking harder than you expected.`
+                },
+                {
+                  label: "Option C",
+                  text: `Write about how the different subjects connected — how Math, Science and Art each helped you solve a different part of the same problem.`,
+                  outcome: `If you chose C: Mrs. Raj is visibly pleased. "You've done something important," she says. "You've seen how learning in one subject can help you in another. That's a habit worth keeping." You feel something settle — like a piece of a larger puzzle has clicked into place.`
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "scene-2",
+          title: "SCENE 2: Lower Secondary — The Canteen Project",
+          settingTitle: "Setting the Scene",
+          setting: [
+            `Secondary school is different from what you expected. There are new subjects, new teachers, a CCA you're still finding your footing in — and fewer year-end exams than you thought there'd be. That last part surprises you. It means you have more room to actually think about things, rather than just prepare for tests.`,
+            `In Sustainable Living, your class is exploring a question that feels genuinely important: How can teenagers reduce food waste in Singapore?`,
+            `Your teacher, Mr. Lim, doesn't give you a worksheet. He tells you to go and find out for yourselves.`,
+            `You start spending time at the school canteen during recess, watching. You notice how much food gets left on plates. You start talking to the stallholders. Uncle Ahmad, who runs the mixed rice stall, tells you he throws away a significant amount of food every single day. He looks tired when he says it.`,
+            `Something about that sticks with you.`
+          ],
+          nextSceneId: "scene-3",
+          endTitle: "End of Scene 2",
+          endText: [
+            `You've spent a term on something that felt purposeful. Uncle Ahmad's canteen is a little different now. You've learned something about what it means to make learning matter beyond the classroom.`,
+            `You're heading into upper secondary. The choices are about to get more increase in more exciting ways.`
+          ],
+          choices: [
+            {
+              id: 4,
+              title: "Choice 4 — How do you want to investigate?",
+              prompt: [
+                `Your group needs to understand the problem before you can solve it. You have a few weeks and some real freedom in how you use them.`
+              ],
+              reflection: `What's guiding your choice here — thoroughness, curiosity, practicality, or something else?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Focus on collecting data — count the plates, weigh the leftovers, build a clear picture of how much is actually being wasted.`,
+                  outcome: `If you chose A: Your data is compelling. Numbers have a way of making a problem feel real and undeniable. But when you present your findings to Uncle Ahmad, he nods slowly and says, "I know. But what do you want me to do about it?" You reflect that data alone doesn't tell you what to change.`
+                },
+                {
+                  label: "Option B",
+                  text: `Focus on understanding why — talk to more students and stallholders to find out what's driving the waste.`,
+                  outcome: `If you chose B: The conversations are rich and sometimes surprising. Students say portions are too large. Uncle Ahmad says he buys his ingredients wholesale and can't easily reduce portions without losing money. You start to connect perspectives from multiple stakeholders — and that makes finding the solution harder, but more impactful.`
+                },
+                {
+                  label: "Option C",
+                  text: `Do both, but accept that you'll have less depth in each area given the time you have.`,
+                  outcome: `If you chose C: You have a bit of everything. It's messier, but it reflects the real complexity of the problem. Mr. Lim tells you, "Real problems rarely fit neatly into one approach."`
+                }
+              ]
+            },
+            {
+              id: 5,
+              title: "Choice 5 — Designing a Solution",
+              prompt: [
+                `Your group has landed on an idea: colour-coded plates that guide students to indicate portion sizes before ordering. Smaller portions, less waste. You've used ratios from Mathematics to work out the plate sizes, and thought carefully about colour choices from Art.`,
+                `But when you bring the idea to Uncle Ahmad, he hesitates. "Need to buy new plates. More cost. I'm not sure this helps me."`,
+                `Your group is deflated. You've worked hard on this. But you can see his point.`
+              ],
+              reflection: `What does your choice say about how you handle a setback?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Go back to the drawing board — the idea clearly doesn't work if the stallholder won't adopt it.`,
+                  outcome: `If you chose A: Starting over is demoralising, but your group comes back with a more practical idea. You learn something important: its important to assess and adjust when facing challenges. `
+                },
+                {
+                  label: "Option B",
+                  text: `Try to persuade Uncle Ahmad by explaining the benefits to students and the school more clearly.`,
+                  outcome: `If you chose B: Uncle Ahmad listens politely but remains unconvinced. You realise that persuasion works better if you try to address the recipient’s real needs.`
+                },
+                {
+                  label: "Option C",
+                  text: `Reframe the conversation — ask Uncle Ahmad what his biggest problem is, and see if your solution can be adjusted to address it too.`,
+                  outcome: `If you chose C: This is harder than it sounds — you have to really listen, and then think on your feet. But when you ask Uncle Ahmad what worries him most, he mentions ingredient costs. You find yourself saying, almost without planning to: "What if this actually helps you save on ingredients?" His expression shifts. The conversation changes.`
+                }
+              ]
+            },
+            {
+              id: 6,
+              title: "Choice 6 — Managing the Final Push",
+              prompt: [
+                `It's the last week before your group's presentation. There's still a lot to finish — your prototype, your portfolio documentation, your reflection. One of your groupmates, Siti, is stressed and wants to redo a section she's unhappy with. Another, Wei Jie, thinks you should just submit what you have.`,
+                `You're somewhere in the middle — tired, but still caring about the outcome.`
+              ],
+              reflection: `How do you usually handle pressure near a deadline — and is that working for you?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Side with Wei Jie. You've done enough. Submit what you have and rest.`,
+                  outcome: `If you chose A: You submit on time and feel relieved. But during the presentation, you notice the gap Siti was worried about. You reflect that addressing gaps ahead of time can alleviate anxieties down the road.`
+                },
+                {
+                  label: "Option B",
+                  text: `Support Siti. If she feels it's not good enough, it's worth the extra effort.`,
+                  outcome: `If you chose B: Siti appreciates it. The section improves. But Wei Jie is frustrated, and the group dynamic feels strained at the end. You wonder whether setting common learning goals ahead of time could have helped everyone work together better. `
+                },
+                {
+                  label: "Option C",
+                  text: `Call a quick group check-in. List what absolutely needs to be done, what would be nice to improve, and decide together.`,
+                  outcome: `If you chose C: With the check-in, your group improves the section with reasonable effort, although it is still not perfect. Even so, the group is pleased that time and resources feel strategically used. `
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "scene-3",
+          title: "SCENE 3: Upper Secondary/JC — Choosing Your Direction",
+          settingTitle: "Setting the Scene",
+          setting: [
+            `After reflecting carefully during CCE lessons in lower secondary, Gabriel has purposely chosen a subject combination that best aligns with his general interests in the Sciences. Now,  near the end of Term 1 in Secondary 3, Gabriel is sitting in the school library. On the table in front of him is a list of elective modules on SLS — learning opportunities he gets to choose based on his interests and needs.`,
+            `Admittedly, Gabriel is staring at the list feeling slightly overwhelmed. "I'm still figuring out what I'm interested in," he admits to himself. However, he recalls his experiences in primary school and lower secondary, which has assured him that he is capable of independent learning – that he has some knowledge of how to learn and reflecting on what matters to him. `,
+            `You've been using the reflection tools on SLS to think about your own learning over the past two years. You suggest trying them together.`,
+            `What comes up surprises both of you. Andy's been quietly curious about his family's coffee shop — the business side, the customers, the rhythms of it. You've been drawn, without quite naming it until now, to questions about food systems and sustainability. The thread from the canteen project in Secondary 1 is still there.`,
+            `You look at each other. "We could do our IPW on this," Andy says.`
+          ],
+          nextSceneId: null,
+          endTitle: "SCENE 3 — End",
+          endText: [
+            `You don't have everything figured out. But as you think back on the many choices you made to diversity your knowledge, skills and competencies, you realise that you know more about how you learn, what you care about, and where you want to go than you could have predicted. That's not nothing. That might, in fact, be everything.`
+          ],
+          choices: [
+            {
+              id: 7,
+              title: "Choice 7 — Defining Your Focus",
+              prompt: [
+                `Your Interdisciplinary Project Work needs a clear question. You and Andy have a shared interest in local food businesses and energy use, but you're approaching it from different angles — Andy from the business and customer side, you from the environmental and systems side.`
+              ],
+              reflection: `What does a good collaboration actually require of you?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Let Andy take the lead on framing the question, since it's his family's business context that sparked the idea.`,
+                  outcome: `If you chose A: The project gets off the ground quickly. But halfway through, you realise you're doing a lot of supporting work without feeling fully invested. You bring this up with Andy. It's an uncomfortable conversation — but an important one.`
+                },
+                {
+                  label: "Option B",
+                  text: `Frame the question around your sustainability interest, since that gives the project a clearer social purpose.`,
+                  outcome: `If you chose B: The project feels meaningful to you, but Andy starts to seem less engaged. Your mentor, Ms Tan, notices and asks you both: "Whose project is this?" It's a question worth sitting with.`
+                },
+                {
+                  label: "Option C",
+                  text: `Spend time negotiating a question that genuinely holds both your interests — even if it takes longer to agree on.`,
+                  outcome: `If you chose C: It takes three sessions to land on a question you're both genuinely excited about: How can local hawker businesses reduce energy use and food waste without increasing costs? It's specific, practical, and it belongs to both of you.`
+                }
+              ]
+            },
+            {
+              id: 8,
+              title: "Choice 8 — When the Research Gets Hard",
+              prompt: [
+                `You're three weeks into the project. Andy is applying thermal processes and heat conduction from Physics to study coffee brewing efficiency. You're examining how roasting and food preparation contribute to energy use and waste. The science is harder than you expected.`,
+                `You hit a wall. The data you've collected from two nearby hawker stalls doesn't show the pattern you expected. Your hypothesis might be wrong.`
+              ],
+              reflection: `How do you usually respond when evidence doesn't support what you believed — and what does that tell you about yourself as a learner?`,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Adjust your hypothesis to fit the data you have, and move forward.`,
+                  outcome: `If you chose A: Your revised hypothesis is more modest but more defensible. Ms Tan later tells you: "Adjusting your thinking based on evidence is exactly what good researchers do." You feel the difference between giving up on an idea and genuinely revising it.`
+                },
+                {
+                  label: "Option B",
+                  text: `Go back and collect more data from additional stalls before drawing any conclusions.`,
+                  outcome: `If you chose B: The additional data is illuminating — and messy. The picture is more complicated than you thought. You spend more time than planned, but your findings are richer for it.`
+                },
+                {
+                  label: "Option C",
+                  text: `Bring the unexpected findings to Ms Tan and ask for her perspective before deciding what to do.`,
+                  outcome: `If you chose C: Ms Tan doesn't give you the answer. She asks you questions instead. "What were you assuming when you designed the data collection? Could the stalls themselves be different in ways that matter?" You leave the conversation with more questions — but better ones.`
+                }
+              ]
+            },
+            {
+              id: 9,
+              title: "Choice 9 — The agency to make your choices",
+              prompt: [
+                `He remembered that during the briefing on EMs, the school mentioned that EMs can be a space for students to explore what appeals to them. He assesses his own experiences in life and learning to determine what interests him more at this stage.`
+              ],
+              reflection: `When you made your choice, were you more interested in deepening or broadening your learning? Did it felt like there was a “better” choice between the two? `,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Choose an EM on animals biology, as he has loved interacting with his neighbour’s cat since young and had been enjoying his upper secondary biology lessons.`,
+                  outcome: `If you chose A: The EM showed you a different area of biology you wouldn’t have otherwise learnt. You weren’t sure whether it’s an area you wanted to pursue further in, but you enjoyed making connections with human biology. `
+                },
+                {
+                  label: "Option B",
+                  text: `Choose an EM on Chinese literature, as although he does not offer Chinese literature as a subject, he recently discovered a few Chinese science fiction books that he really liked,`,
+                  outcome: `If you chose B: The EM gave you a new perspective of how fun languages can be, and prompted you to read more widely in your mother tongue.`
+                }
+              ]
+            },
+            {
+              id: 10,
+              title: "Choice 10 — Curricular diversity",
+              prompt: [
+                `Its now the start of Secondary 4. Gabriel feels disappointed that he missed out on a school-based healthcare enrichment programme due to the limited number of slots available, He decides to not give up, and to search for possible ways to pursue similar learning opportunities through EMs. `
+              ],
+              reflection: `Could EMs be an avenue for students to connect and apply concepts in more diverse wqys? `,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Choose an EM on prion diseases, which is a type of disease you hadn’t learnt about in biology class.`,
+                  outcome: `If you chose A: You connect and apply what you’ve learnt to your ongoing science project, and in doing so, realise a common thread about how much you care about protecting living things. `
+                },
+                {
+                  label: "Option B",
+                  text: `Choose an EM on mathematical modelling in epidemiology, as you were intrigued that math could be so important in healthcare. `,
+                  outcome: `If you chose B: You connect and apply what you’ve learnt to your ongoing science project, and in doing so, realise a common thread about how much you care about protecting living things.`
+                }
+              ]
+            },
+            {
+              id: 11,
+              title: "Choice 11 – Keeping up to date!",
+              prompt: [
+                `Gabriel is now in his first year of Junior College! He read about a recent news development where a local company made use of AI to develop cancer cures. He went onto SLS and found to his surprise that some EMs had also been recently updated to reflect the latest developments in various fields, including medical science and AI. `
+              ],
+              reflection: null,
+              options: [
+                {
+                  label: "Option A",
+                  text: `Choose an EM that showcases how AI has been used to create artworks, and their implications on artists and copyright.`,
+                  outcome: `If you choose A: You reflect that AI has the ability to impact diverse fields, and can be a powerful tool for your own learning in school as well.`
+                },
+                {
+                  label: "Option B",
+                  text: `Choose an EM that showcases how AI has been used to process large DNA datasets more accurately, and what it means for personal genomic information. `,
+                  outcome: `If you choose B: You reflect that AI has the ability to impact diverse fields, and can be a powerful tool for your own learning in school as well.`
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    // Navigation state.
+    const totalChoices = storyData.scenes.reduce((sum, scene) => sum + scene.choices.length, 0);
+    const playerChoices = [];
+    let currentSceneIndex = 0;
+    let currentChoiceIndex = 0;
+
+    const contentPanel = document.getElementById("content-panel");
+    const progressText = document.getElementById("progress-text");
+    const progressFill = document.getElementById("progress-fill");
+
+    // Render helpers.
+    function resetInternalScroll() {
+      contentPanel.scrollTop = 0;
+    }
+
+    function clearContent() {
+      contentPanel.innerHTML = "";
+    }
+
+    function createElement(tagName, className, text) {
+      const element = document.createElement(tagName);
+
+      if (className) {
+        element.className = className;
+      }
+
+      if (typeof text === "string") {
+        element.textContent = text;
+      }
+
+      return element;
+    }
+
+    function appendParagraphs(parent, paragraphs) {
+      paragraphs.forEach((paragraphText) => {
+        parent.appendChild(createElement("p", "", paragraphText));
+      });
+    }
+
+    function createButton(text, className, onClick) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = className;
+      button.textContent = text;
+      button.addEventListener("click", onClick);
+      return button;
+    }
+
+    function getChoiceByNumber(choiceNumber) {
+      for (const scene of storyData.scenes) {
+        const foundChoice = scene.choices.find((choice) => choice.id === choiceNumber);
+        if (foundChoice) {
+          return foundChoice;
+        }
+      }
+      return null;
+    }
+
+    function updateProgress(viewType, sceneIndex = 0, choiceNumber = 0) {
+      let displayText = "";
+      let fillPercent = 0;
+
+      if (viewType === "welcome") {
+        displayText = `How to Play · Choice 0 of ${totalChoices}`;
+        fillPercent = 0;
+      } else if (viewType === "final") {
+        displayText = `Final Summary · Choice ${totalChoices} of ${totalChoices}`;
+        fillPercent = 100;
+      } else {
+        const safeSceneIndex = Math.max(0, Math.min(sceneIndex, storyData.scenes.length - 1));
+        const safeChoiceNumber = Math.max(0, Math.min(choiceNumber, totalChoices));
+        displayText = `Scene ${safeSceneIndex + 1} of ${storyData.scenes.length} · Choice ${safeChoiceNumber} of ${totalChoices}`;
+        fillPercent = totalChoices === 0 ? 0 : (safeChoiceNumber / totalChoices) * 100;
+      }
+
+      progressText.textContent = displayText;
+      progressFill.style.width = `${fillPercent}%`;
+    }
+
+    function getNextChoiceNumberForScene(sceneIndex) {
+      const scene = storyData.scenes[sceneIndex];
+      return scene && scene.choices.length ? scene.choices[0].id : 0;
+    }
+
+    // Render functions.
+    function renderWelcome() {
+      clearContent();
+      updateProgress("welcome");
+
+      const screen = createElement("article", "screen card");
+      screen.appendChild(createElement("p", "kicker", storyData.introTitle));
+      screen.appendChild(createElement("h1", "", storyData.title));
+      appendParagraphs(screen, storyData.intro);
+
+      const buttonRow = createElement("div", "button-row");
+      buttonRow.appendChild(
+        createButton("Begin Your Journey", "primary-button", () => {
+          renderSceneOpening(0);
+        })
+      );
+      screen.appendChild(buttonRow);
+
+      contentPanel.appendChild(screen);
+      resetInternalScroll();
+    }
+
+    function renderSceneOpening(sceneIndex) {
+      currentSceneIndex = sceneIndex;
+      currentChoiceIndex = 0;
+
+      const scene = storyData.scenes[sceneIndex];
+      const nextChoiceNumber = getNextChoiceNumberForScene(sceneIndex);
+
+      clearContent();
+      updateProgress("scene", sceneIndex, nextChoiceNumber);
+
+      const screen = createElement("article", "screen card scene-card");
+      screen.appendChild(createElement("p", "kicker", `Scene ${sceneIndex + 1}`));
+      screen.appendChild(createElement("h2", "", scene.title));
+      screen.appendChild(createElement("h3", "", scene.settingTitle));
+      appendParagraphs(screen, scene.setting);
+
+      const buttonRow = createElement("div", "button-row");
+      buttonRow.appendChild(
+        createButton(`Continue to Choice ${nextChoiceNumber}`, "primary-button", () => {
+          renderChoice(sceneIndex, 0);
+        })
+      );
+      screen.appendChild(buttonRow);
+
+      contentPanel.appendChild(screen);
+      resetInternalScroll();
+    }
+
+    function renderChoice(sceneIndex, choiceIndex) {
+      currentSceneIndex = sceneIndex;
+      currentChoiceIndex = choiceIndex;
+
+      const scene = storyData.scenes[sceneIndex];
+      const choice = scene.choices[choiceIndex];
+
+      clearContent();
+      updateProgress("choice", sceneIndex, choice.id);
+
+      const screen = createElement("article", "screen card choice-card");
+      screen.appendChild(createElement("p", "kicker", scene.title));
+      screen.appendChild(createElement("h2", "", choice.title));
+      appendParagraphs(screen, choice.prompt);
+
+      const choiceList = createElement("div", "choice-list");
+      choice.options.forEach((option) => {
+        const optionButtonText = `${option.label}: ${option.text}`;
+        const optionButton = createButton(optionButtonText, "choice-button", () => {
+          handleChoiceSelection(sceneIndex, choiceIndex, option);
+        });
+        choiceList.appendChild(optionButton);
+      });
+      screen.appendChild(choiceList);
+
+      if (choice.reflection) {
+        screen.appendChild(createElement("div", "reflection-callout", choice.reflection));
+      }
+
+      contentPanel.appendChild(screen);
+      resetInternalScroll();
+    }
+
+    function renderOutcome(sceneIndex, choiceIndex, selectedOption) {
+      const scene = storyData.scenes[sceneIndex];
+      const choice = scene.choices[choiceIndex];
+
+      clearContent();
+      updateProgress("outcome", sceneIndex, choice.id);
+
+      const screen = createElement("article", "screen card");
+      screen.appendChild(createElement("p", "kicker", `${scene.title} · ${choice.title}`));
+      screen.appendChild(createElement("h2", "", "Outcome"));
+
+      const selectedOptionBox = createElement(
+        "div",
+        "selected-option",
+        `${selectedOption.label}: ${selectedOption.text}`
+      );
+      screen.appendChild(selectedOptionBox);
+
+      const outcomeCard = createElement("div", "outcome-card");
+      outcomeCard.appendChild(createElement("p", "", selectedOption.outcome));
+      screen.appendChild(outcomeCard);
+
+      const buttonRow = createElement("div", "button-row");
+      buttonRow.appendChild(
+        createButton("Continue", "primary-button", () => {
+          navigateAfterOutcome(sceneIndex, choiceIndex);
+        })
+      );
+      screen.appendChild(buttonRow);
+
+      contentPanel.appendChild(screen);
+      resetInternalScroll();
+    }
+
+    function renderSceneEnd(sceneIndex) {
+      const scene = storyData.scenes[sceneIndex];
+      const lastChoiceNumber = scene.choices.length ? scene.choices[scene.choices.length - 1].id : 0;
+
+      clearContent();
+      updateProgress("scene-end", sceneIndex, lastChoiceNumber);
+
+      const screen = createElement("article", "screen card closing-card");
+      screen.appendChild(createElement("p", "kicker", scene.title));
+      screen.appendChild(createElement("h2", "", scene.endTitle));
+      appendParagraphs(screen, scene.endText);
+
+      const buttonRow = createElement("div", "button-row");
+      if (scene.nextSceneId) {
+        buttonRow.appendChild(
+          createButton("Continue to Next Scene", "primary-button", () => {
+            renderSceneOpening(sceneIndex + 1);
+          })
+        );
+      } else {
+        buttonRow.appendChild(
+          createButton("Continue to Final Summary", "primary-button", () => {
+            renderFinalSummary();
+          })
+        );
+      }
+
+      screen.appendChild(buttonRow);
+      contentPanel.appendChild(screen);
+      resetInternalScroll();
+    }
+
+    // Event handlers and navigation logic.
+    function handleChoiceSelection(sceneIndex, choiceIndex, selectedOption) {
+      const scene = storyData.scenes[sceneIndex];
+      const choice = scene.choices[choiceIndex];
+
+      playerChoices.push({
+        sceneTitle: scene.title,
+        choiceNumber: choice.id,
+        choiceTitle: choice.title,
+        selectedOptionLabel: selectedOption.label,
+        selectedOptionText: selectedOption.text,
+        outcomeText: selectedOption.outcome
+      });
+
+      renderOutcome(sceneIndex, choiceIndex, selectedOption);
+    }
+
+    function navigateAfterOutcome(sceneIndex, choiceIndex) {
+      const scene = storyData.scenes[sceneIndex];
+      const nextChoiceIndex = choiceIndex + 1;
+
+      if (nextChoiceIndex < scene.choices.length) {
+        renderChoice(sceneIndex, nextChoiceIndex);
+      } else {
+        renderSceneEnd(sceneIndex);
+      }
+    }
+
+    function restartGame() {
+      playerChoices.splice(0, playerChoices.length);
+      currentSceneIndex = 0;
+      currentChoiceIndex = 0;
+      renderWelcome();
+    }
+
+    // Timeline builder.
+    function getOutcomePreview(outcomeText) {
+      const abbreviations = [
+        ["Mrs.", "Mrs[dot]"],
+        ["Mr.", "Mr[dot]"],
+        ["Ms.", "Ms[dot]"]
+      ];
+
+      let protectedText = outcomeText;
+      abbreviations.forEach(([original, replacement]) => {
+        protectedText = protectedText.replaceAll(original, replacement);
+      });
+
+      const sentenceMatch = protectedText.match(/^.*?[.!?](?=\s|$|")/);
+      let preview = sentenceMatch ? sentenceMatch[0] : protectedText;
+
+      abbreviations.forEach(([original, replacement]) => {
+        preview = preview.replaceAll(replacement, original);
+      });
+
+      return preview;
+    }
+
+    function renderFinalSummary() {
+      clearContent();
+      updateProgress("final");
+
+      const screen = createElement("article", "screen");
+      const summaryCard = createElement("section", "card");
+      summaryCard.appendChild(createElement("p", "kicker", "Final Summary"));
+      summaryCard.appendChild(createElement("h1", "", "Your Learning Timeline"));
+
+      const timeline = createElement("div", "timeline");
+
+      playerChoices.forEach((entry) => {
+        const timelineEntry = createElement("div", "timeline-entry");
+        timelineEntry.appendChild(createElement("p", "timeline-label", `Choice ${entry.choiceNumber}`));
+        timelineEntry.appendChild(createElement("h3", "", entry.sceneTitle));
+        timelineEntry.appendChild(createElement("p", "", `${entry.selectedOptionLabel}: ${entry.selectedOptionText}`));
+        timelineEntry.appendChild(createElement("p", "", getOutcomePreview(entry.outcomeText)));
+        timeline.appendChild(timelineEntry);
+      });
+
+      summaryCard.appendChild(timeline);
+
+      const closingNote = createElement("section", "closing-note");
+      closingNote.appendChild(createElement("h2", "", storyData.closingNoteTitle));
+      appendParagraphs(closingNote, storyData.closingNote);
+      summaryCard.appendChild(closingNote);
+
+      const buttonRow = createElement("div", "button-row");
+      buttonRow.appendChild(
+        createButton("Restart Journey", "secondary-button", () => {
+          restartGame();
+        })
+      );
+      summaryCard.appendChild(buttonRow);
+
+      screen.appendChild(summaryCard);
+      contentPanel.appendChild(screen);
+      resetInternalScroll();
+    }
+
+    // Start the single-page game.
+    renderWelcome();
+  </script>
+</body>
+</html>
