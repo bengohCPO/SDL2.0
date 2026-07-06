@@ -162,6 +162,35 @@
       white-space: pre-wrap;
     }
 
+    strong {
+      color: var(--heading);
+      font-weight: 850;
+    }
+
+    em {
+      color: inherit;
+      font-style: italic;
+    }
+
+    .story-underline {
+      text-decoration-line: underline;
+      text-decoration-thickness: 0.11em;
+      text-decoration-color: var(--accent);
+      text-underline-offset: 0.18em;
+    }
+
+    .choice-button strong,
+    .choice-button em,
+    .choice-button .story-underline,
+    .primary-button strong,
+    .primary-button em,
+    .primary-button .story-underline,
+    .secondary-button strong,
+    .secondary-button em,
+    .secondary-button .story-underline {
+      color: inherit;
+    }
+
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -404,7 +433,7 @@
     <section class="progress-shell" aria-label="Game progress">
       <div class="progress-row">
         <p class="progress-title">Your Learning Journey</p>
-        <p class="progress-text" id="progress-text">How to Play · Choice 0 of 11</p>
+        <p class="progress-text" id="progress-text">How to Play · Choice 0 of 9</p>
       </div>
       <div class="progress-track" aria-hidden="true">
         <div class="progress-fill" id="progress-fill"></div>
@@ -416,11 +445,15 @@
 
   <script>
     // Data layer: all storyline content, scene order, choice labels, outcomes, and scene pointers live here.
+    // Inline formatting supported inside storyline strings:
+    // **bold text**
+    // *italic text*
+    // __underlined text__
     const storyData = {
       title: "Your Learning Journey: A Story of Gabriel — and You",
       introTitle: "How to Play",
       intro: [
-        `You are Gabriel. As you move through school, you will face moments where you need to make choices — about <b>how to learn, who to work with, and what matters to you</b>. There are no wrong answers. Some paths will be harder, some more rewarding. Pay attention to why you make each choice. That's where the real learning happens.`
+        `You are Gabriel. As you move through school, you will face moments where you need to make choices — about **how to learn, who to work with, and what matters to you**. There are no wrong answers. Some paths will be harder, some more rewarding. Pay attention to why you make each choice. That's where the real learning happens.`
       ],
       closingNoteTitle: "A Note for Players",
       closingNote: [
@@ -435,7 +468,7 @@
           settingTitle: "Setting the Scene",
           setting: [
             `It's a Tuesday morning in Mrs. Raj's Mathematics class. You feel bothered about something she had explained. She had drawn two shapes on the board — a long, thin rectangle and a squarish one. Both have the same perimeter. But their areas are completely different.`,
-            `How can that be? You stare at your notebook. The numbers are right there, but they don't feel real yet.`,
+            `*How can that be?* You stare at your notebook. The numbers are right there, but they don't feel real yet.`,
             `Then Mrs. Raj announces a class project: your class will redesign the reading corner. She wants your group to come up with the best possible layout — one that gives students the most space and feels welcoming.`,
             `You look over at the reading corner. It's a bit cramped. You've always wanted it to be better.`
           ],
@@ -452,7 +485,7 @@
               prompt: [
                 `Mrs. Raj gives your group some time to plan. Your groupmates are already talking over each other. You have a few ideas about how to begin.`
               ],
-              reflection: `Take a moment — why did you pick that option? What were you hoping it would help you do?`,
+              reflection: `*Take a moment — why did you pick that option? What were you hoping it would help you do?*`,
               options: [
                 {
                   label: "Option A",
@@ -767,6 +800,45 @@
     const progressText = document.getElementById("progress-text");
     const progressFill = document.getElementById("progress-fill");
 
+    // Formatting helpers: safely escape story text, then convert simple inline markers into styled HTML.
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatStoryText(text) {
+      let formattedText = escapeHtml(text);
+      const replacements = [];
+
+      function storeReplacement(html) {
+        const token = `@@STORY_FORMAT_${replacements.length}@@`;
+        replacements.push({ token, html });
+        return token;
+      }
+
+      formattedText = formattedText.replace(/\*\*(.+?)\*\*/gs, (match, content) => {
+        return storeReplacement(`<strong>${content}</strong>`);
+      });
+
+      formattedText = formattedText.replace(/__(.+?)__/gs, (match, content) => {
+        return storeReplacement(`<span class="story-underline">${content}</span>`);
+      });
+
+      formattedText = formattedText.replace(/\*(.+?)\*/gs, (match, content) => {
+        return storeReplacement(`<em>${content}</em>`);
+      });
+
+      replacements.forEach(({ token, html }) => {
+        formattedText = formattedText.replaceAll(token, html);
+      });
+
+      return formattedText;
+    }
+
     // Render helpers.
     function resetInternalScroll() {
       contentPanel.scrollTop = 0;
@@ -790,9 +862,23 @@
       return element;
     }
 
+    function createFormattedElement(tagName, className, text) {
+      const element = document.createElement(tagName);
+
+      if (className) {
+        element.className = className;
+      }
+
+      if (typeof text === "string") {
+        element.innerHTML = formatStoryText(text);
+      }
+
+      return element;
+    }
+
     function appendParagraphs(parent, paragraphs) {
       paragraphs.forEach((paragraphText) => {
-        parent.appendChild(createElement("p", "", paragraphText));
+        parent.appendChild(createFormattedElement("p", "", paragraphText));
       });
     }
 
@@ -800,7 +886,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = className;
-      button.textContent = text;
+      button.innerHTML = formatStoryText(text);
       button.addEventListener("click", onClick);
       return button;
     }
@@ -847,8 +933,8 @@
       updateProgress("welcome");
 
       const screen = createElement("article", "screen card");
-      screen.appendChild(createElement("p", "kicker", storyData.introTitle));
-      screen.appendChild(createElement("h1", "", storyData.title));
+      screen.appendChild(createFormattedElement("p", "kicker", storyData.introTitle));
+      screen.appendChild(createFormattedElement("h1", "", storyData.title));
       appendParagraphs(screen, storyData.intro);
 
       const buttonRow = createElement("div", "button-row");
@@ -875,8 +961,8 @@
 
       const screen = createElement("article", "screen card scene-card");
       screen.appendChild(createElement("p", "kicker", `Scene ${sceneIndex + 1}`));
-      screen.appendChild(createElement("h2", "", scene.title));
-      screen.appendChild(createElement("h3", "", scene.settingTitle));
+      screen.appendChild(createFormattedElement("h2", "", scene.title));
+      screen.appendChild(createFormattedElement("h3", "", scene.settingTitle));
       appendParagraphs(screen, scene.setting);
 
       const buttonRow = createElement("div", "button-row");
@@ -902,8 +988,8 @@
       updateProgress("choice", sceneIndex, choice.id);
 
       const screen = createElement("article", "screen card choice-card");
-      screen.appendChild(createElement("p", "kicker", scene.title));
-      screen.appendChild(createElement("h2", "", choice.title));
+      screen.appendChild(createFormattedElement("p", "kicker", scene.title));
+      screen.appendChild(createFormattedElement("h2", "", choice.title));
       appendParagraphs(screen, choice.prompt);
 
       const choiceList = createElement("div", "choice-list");
@@ -917,7 +1003,7 @@
       screen.appendChild(choiceList);
 
       if (choice.reflection) {
-        screen.appendChild(createElement("div", "reflection-callout", choice.reflection));
+        screen.appendChild(createFormattedElement("div", "reflection-callout", choice.reflection));
       }
 
       contentPanel.appendChild(screen);
@@ -932,10 +1018,10 @@
       updateProgress("outcome", sceneIndex, choice.id);
 
       const screen = createElement("article", "screen card");
-      screen.appendChild(createElement("p", "kicker", `${scene.title} · ${choice.title}`));
+      screen.appendChild(createFormattedElement("p", "kicker", `${scene.title} · ${choice.title}`));
       screen.appendChild(createElement("h2", "", "Outcome"));
 
-      const selectedOptionBox = createElement(
+      const selectedOptionBox = createFormattedElement(
         "div",
         "selected-option",
         `${selectedOption.label}: ${selectedOption.text}`
@@ -943,7 +1029,7 @@
       screen.appendChild(selectedOptionBox);
 
       const outcomeCard = createElement("div", "outcome-card");
-      outcomeCard.appendChild(createElement("p", "", selectedOption.outcome));
+      outcomeCard.appendChild(createFormattedElement("p", "", selectedOption.outcome));
       screen.appendChild(outcomeCard);
 
       const buttonRow = createElement("div", "button-row");
@@ -966,8 +1052,8 @@
       updateProgress("scene-end", sceneIndex, lastChoiceNumber);
 
       const screen = createElement("article", "screen card closing-card");
-      screen.appendChild(createElement("p", "kicker", scene.title));
-      screen.appendChild(createElement("h2", "", scene.endTitle));
+      screen.appendChild(createFormattedElement("p", "kicker", scene.title));
+      screen.appendChild(createFormattedElement("h2", "", scene.endTitle));
       appendParagraphs(screen, scene.endText);
 
       const buttonRow = createElement("div", "button-row");
@@ -1062,16 +1148,16 @@
       playerChoices.forEach((entry) => {
         const timelineEntry = createElement("div", "timeline-entry");
         timelineEntry.appendChild(createElement("p", "timeline-label", `Choice ${entry.choiceNumber}`));
-        timelineEntry.appendChild(createElement("h3", "", entry.sceneTitle));
-        timelineEntry.appendChild(createElement("p", "", `${entry.selectedOptionLabel}: ${entry.selectedOptionText}`));
-        timelineEntry.appendChild(createElement("p", "", getOutcomePreview(entry.outcomeText)));
+        timelineEntry.appendChild(createFormattedElement("h3", "", entry.sceneTitle));
+        timelineEntry.appendChild(createFormattedElement("p", "", `${entry.selectedOptionLabel}: ${entry.selectedOptionText}`));
+        timelineEntry.appendChild(createFormattedElement("p", "", getOutcomePreview(entry.outcomeText)));
         timeline.appendChild(timelineEntry);
       });
 
       summaryCard.appendChild(timeline);
 
       const closingNote = createElement("section", "closing-note");
-      closingNote.appendChild(createElement("h2", "", storyData.closingNoteTitle));
+      closingNote.appendChild(createFormattedElement("h2", "", storyData.closingNoteTitle));
       appendParagraphs(closingNote, storyData.closingNote);
       summaryCard.appendChild(closingNote);
 
