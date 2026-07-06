@@ -42,16 +42,18 @@
       min-height: 100%;
     }
 
-    .game-container {
-      width: min(980px, 100%);
-      height: 100vh;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      background: rgba(255, 250, 242, 0.92);
-      box-shadow: 0 0 40px var(--shadow);
-      overflow: hidden;
-    }
+   .game-container {
+  width: min(980px, 100%);
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 250, 242, 0.92);
+  box-shadow: 0 0 40px var(--shadow);
+  overflow: hidden;
+}
 
     .progress-shell {
       flex: 0 0 auto;
@@ -99,12 +101,15 @@
       transition: width 220ms ease;
     }
 
-    .content-panel {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      padding: clamp(1.25rem, 4vw, 2.5rem);
-      scroll-behavior: smooth;
-    }
+.content-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
 
     .screen {
       max-width: 780px;
@@ -575,6 +580,8 @@
           endText: [
             `You've spent a term on something that felt purposeful. Uncle Ahmad's canteen is a little different now. You've learned something about what it means to make learning matter beyond the classroom.`,
             `You're heading into upper secondary. The choices are about to increase in more exciting ways.`
+            `In upper Secondary, you will choose **Elective Modules** that reflect your own interests and strengths. The habits you have built - of asking why, staying with uncertainty, and connecting ideas - will help you decided **what** Elective Modules to choose, and **how** you are going to leverage them for your learning. Already, you are excited to explore an Elective Module on design, to extend what y ou learned in Uncle Ahmad's canteen.`
+            `More importantly, you are hopeful that the choices you make in Upper Secondary - in **what** and **how** you learn - might lead you towards something bigger: a sense of purpose. You are excited to see how that sense of purpose might one day help you to contribute to wider society.`
           ],
           choices: [
             {
